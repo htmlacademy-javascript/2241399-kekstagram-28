@@ -1,26 +1,33 @@
 function getStringLength(phrase, maxSymbols) {
-  if (phrase.length <= maxSymbols){
-    return true;
-  }
-  return false;
+  return phrase.length <= maxSymbols;
 }
-getStringLength('lslsls', 5);
 
 function isPalindrome(string) {
-  const strLet = string.length;
   string = string.toLowerCase().replaceAll(' ', '');
   const strReverse = string.split('').reverse().join('');
-  if (strReverse == string) {
+  if (strReverse === string) {
     return true;
   }
   return false;
 }
 
-isPalindrome('abccba');
 
-function getNumber(str) {
-  const intNumber = parseInt(str, 10);
-  const positiveIntNumber = Math.abs(intNumber);
-  return positiveIntNumber;
+function extractNumber(string) {
+  let result = '';
+  for (let i = 0; i < string.length; i++){
+    if(!Number.isNaN(parseInt(string.at(i), 10))) {
+      result += string.at(i);
+    }
+  }
+  return parseInt(result, 10);
 }
-getNumber('-0,5');
+
+function myPadStart(string, minLenght, pad) {
+  const actualPad = minLenght - string.length;
+
+  if (actualPad <= 0) {
+    return string;
+  }
+
+  return pad.slice(0, actualPad % pad.length) + pad.repeat(actualPad / pad.lenght) + string;
+}
