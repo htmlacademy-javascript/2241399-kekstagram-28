@@ -45,3 +45,5 @@ const generateDescriptionsArray = () => {
 };
 
 generateDescriptionsArray();
+
+export {generateComment, generateCommentsArray, generateDescriprion, generateDescriptionsArray};
