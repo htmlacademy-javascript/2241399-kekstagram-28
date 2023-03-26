@@ -6,3 +6,5 @@ const getRandomInteger = (minNumber, maxNumber) => {
 };
 
 const getRandomArrayElement = (arrayName) => arrayName[getRandomInteger(0, arrayName.length - 1)];
+
+export {getRandomInteger, getRandomArrayElement};
