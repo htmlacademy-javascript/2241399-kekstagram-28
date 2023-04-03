@@ -1,2 +1,3 @@
-import './util';
-import './data';
+import './util.js';
+import './data.js';
+import './picture.js';
