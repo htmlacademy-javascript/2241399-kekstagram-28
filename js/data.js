@@ -1,4 +1,4 @@
-import {getRandomInteger, getRandomArrayElement} from './util';
+import {getRandomInteger, getRandomArrayElement} from './util.js';
 
 const DESCRIPTIONS_LIST = ['Дерево', 'Хоршо', 'Дорога'];
 const MESSAGES_LIST = ['Всё отлично!', 'В целом всё неплохо. Но не всё.',
@@ -30,7 +30,7 @@ const generateCommentsArray = (count) => {
 
 const generateDescriprion = (i) => ({
   id: i,
-  url: `photos/${i}.jpg`,
+  url: `photos/${i + 1}.jpg`,
   description: getRandomArrayElement(DESCRIPTIONS_LIST),
   likes: getRandomInteger(COUNT_LIKES_MIN, COUNT_LIKES_MAX),
   comments: generateCommentsArray(COUNT_COMMENTS),
