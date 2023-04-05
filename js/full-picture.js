@@ -50,17 +50,15 @@ const openBigPicture = (src, countLikes, countComments, description) => {
 };
 
 const generateComments = (commentsArray) => {
+  const commentElement = bigPictureElement.querySelector('.social__comment').cloneNode(true);
+  commentsList.innerHTML = '';
   commentsArray.forEach((comment) => {
-    const commentElement = bigPictureElement.querySelector('.social__comment').cloneNode(true);
-    commentElement.querySelector('.social__picture').src = comment.avatar;
-    commentElement.querySelector('.social__picture').alt = comment.name;
-    commentElement.querySelector('.social__text').textContent = comment.message;
-
-
-    commentsList.appendChild(commentElement);
+    const cloneCommentElement = commentElement.cloneNode(true);
+    cloneCommentElement.querySelector('.social__picture').src = comment.avatar;
+    cloneCommentElement.querySelector('.social__picture').alt = comment.name;
+    cloneCommentElement.querySelector('.social__text').textContent = comment.message;
+    commentsList.appendChild(cloneCommentElement);
   });
-
-  // commentsList.appendChild(picturesFragment);
 };
 
 bigPictureOpenElements.forEach((picture, index) => {
