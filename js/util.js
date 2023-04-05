@@ -7,4 +7,8 @@ const getRandomInteger = (minNumber, maxNumber) => {
 
 const getRandomArrayElement = (arrayName) => arrayName[getRandomInteger(0, arrayName.length - 1)];
 
-export {getRandomInteger, getRandomArrayElement};
+const isEscapeKey = (evt) => evt.key === 'Escape';
+const isEnterKey = (evt) => evt.key === 'Enter';
+
+
+export {getRandomInteger, getRandomArrayElement, isEscapeKey, isEnterKey};

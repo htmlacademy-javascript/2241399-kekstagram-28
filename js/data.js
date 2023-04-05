@@ -46,4 +46,4 @@ const generateDescriptionsArray = () => {
 
 generateDescriptionsArray();
 
-export {generateDescriptionsArray};
+export {generateDescriptionsArray, generateDescriprion};
