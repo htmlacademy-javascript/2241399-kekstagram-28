@@ -24,4 +24,4 @@ const generatePictures = () => {
 
 generatePictures();
 
-export {generatePictures};
+export {generatePictures, picturesData};
