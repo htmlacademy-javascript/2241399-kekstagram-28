@@ -10,7 +10,7 @@ const NAMES_LIST = ['Маша', 'Катя', 'Петя'];
 
 const COUNT_LIKES_MIN = 1;
 const COUNT_LIKES_MAX = 5;
-const COUNT_COMMENTS = 3;
+const COUNT_COMMENTS = 10;
 const COUNT_DESCRIPTIONS = 25;
 
 const generateComment = (index) => ({

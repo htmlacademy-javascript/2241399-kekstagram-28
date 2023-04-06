@@ -13,6 +13,12 @@ const countLikesElement = bigPictureElement.querySelector('.likes-count');
 const countCommentsElement = bigPictureElement.querySelector('.comments-count');
 const commentsList = bigPictureElement.querySelector('.social__comments');
 const descriptionElement = bigPictureElement.querySelector('.social__caption');
+const currentCommetsCount = bigPictureElement.querySelector('.comments-current-count');
+const commentsLoader = document.querySelector('.comments-loader');
+const PAGE_LIMIT = 5;
+const FIRST_PAGE_INDEX = 1;
+
+let currentPage = FIRST_PAGE_INDEX;
 
 
 const onBigPictureEscKeydown = (evt) => {
@@ -22,36 +28,83 @@ const onBigPictureEscKeydown = (evt) => {
   }
 };
 
-const commentsCounter = document.querySelector('.social__comment-count');
-const commentsLoader = document.querySelector('.comments-loader');
+//Пришлось занести в функцию openBigPicture функции handleButtonStatus и showComments,
+//так как найти способ как-то по-другому удалять обработчик кнопки commentsLoader не получилось
 
-const closeBigPicture = () => {
-  document.querySelector('.big-picture').classList.add('hidden');
-
-  document.removeEventListener('keydown', onBigPictureEscKeydown);
-
-  body.classList.remove('modal-open');
-};
-
+//Функция для открытия модалки с большим фото и подробной информацией
 const openBigPicture = (src, countLikes, countComments, description) => {
+  //Добавляем данные выбранного фото в разметку
   bigPictureImgElement.src = src;
   countLikesElement.textContent = countLikes;
   countCommentsElement.textContent = countComments;
   descriptionElement.textContent = description;
-
 
   bigPictureElement.classList.remove('hidden');
 
   document.addEventListener('keydown', onBigPictureEscKeydown);
 
   body.classList.add('modal-open');
-  commentsCounter.classList.add('hidden');
-  commentsLoader.classList.add('hidden');
+
+  //Массив данных с элементами - комментариями
+  const commentsArray = bigPictureElement.querySelectorAll('.social__comment');
+
+  //Считаем количество всех страниц с комментариями
+  const pageCount = Math.ceil(commentsArray.length / PAGE_LIMIT);
+
+  //сбрасываем счетчик текущей страницы на начальное значение
+
+  currentPage = FIRST_PAGE_INDEX;
+  currentCommetsCount.textContent = commentsArray.length > PAGE_LIMIT ? PAGE_LIMIT : commentsArray.length;
+  commentsLoader.classList.remove('hidden');
+
+  //Скрываем все комментарии, которые потом будем показывать постранично по нажатию на кнопку "Показать еще"
+  for (let i = currentCommetsCount.textContent; i < commentsArray.length; i++) {
+    commentsArray[i].classList.add('hidden');
+  }
+
+  const handleButtonStatus = () => {
+    if (pageCount <= currentPage) {
+      commentsLoader.classList.add('hidden');
+      commentsLoader.removeEventListener('click', myListener);
+    }
+  };
+
+  handleButtonStatus();
+
+  //Функция постраничного отображения комментариев
+  const showComments = (pageIndex) => {
+    //увеличиваем индекс текущей страницы
+    currentPage = pageIndex;
+
+    //Проверяем, находимся ли мы на последней странице, чтобы скрыть кнопку "Показать еще"
+    handleButtonStatus();
+
+    const startRange = (pageIndex - 1) * PAGE_LIMIT;
+    const endRange = currentPage === pageCount ? commentsArray.length : pageIndex * PAGE_LIMIT;
+
+    for (let i = startRange; i < endRange; i++) {
+      commentsArray[i].classList.remove('hidden');
+    }
+
+    //Обновляем цифру отображенных комментов на странице в разметке
+    currentCommetsCount.textContent = endRange;
+  };
+
+  function myListener() {
+    showComments(currentPage + 1);
+  }
+
+  //Обработчик нажатия на кнопку "Показать еще"
+  commentsLoader.addEventListener('click', myListener);
 };
 
 const generateComments = (commentsArray) => {
   const commentElement = bigPictureElement.querySelector('.social__comment').cloneNode(true);
+
+  //Очищаем список комментариев
   commentsList.innerHTML = '';
+
+  //Создаем комментарии с данными выбранного фото и добавляем их в модалку
   commentsArray.forEach((comment) => {
     const cloneCommentElement = commentElement.cloneNode(true);
     cloneCommentElement.querySelector('.social__picture').src = comment.avatar;
@@ -71,15 +124,21 @@ bigPictureOpenElements.forEach((picture, index) => {
     const imgLikes = picture.querySelector('.picture__likes').textContent;
     const imgComents = picture.querySelector('.picture__comments').textContent;
     const imgDescription = picturesData[index].description;
+
     openBigPicture(imgSrc, imgLikes, imgComents, imgDescription);
   });
 });
 
+const closeBigPicture = () => {
+  document.querySelector('.big-picture').classList.add('hidden');
+
+  document.removeEventListener('keydown', onBigPictureEscKeydown);
+
+  body.classList.remove('modal-open');
+};
 
 bigPictureCloseElement.addEventListener('click', () => {
   closeBigPicture();
 });
 
-
 export {openBigPicture, closeBigPicture};
-
