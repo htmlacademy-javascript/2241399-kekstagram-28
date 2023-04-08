@@ -1408,3 +1408,12 @@ main {
 .hidden {
   display: none;
 }
+
+.img-upload__field-wrapper__error {
+  position: relative;
+  background-color: #ff4e4e;
+  color: #000000;
+  font-size: 12px;
+  margin-top: -20px;
+  z-index: 15;
+}
