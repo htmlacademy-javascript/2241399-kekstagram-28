@@ -1,3 +1,5 @@
+import { resetScale } from './scale.js';
+
 const VALID_SYMBOLS = /^#[a-zа-яё0-9]{1,19}$/i;
 const MAX_HASHTAG_COUN = 5;
 const TAG_ERROR_TEXT = 'Хэштеги заполнены неверно';
@@ -24,6 +26,8 @@ const openModal = () => {
 
 const closeModal = () => {
   form.reset();
+  resetScale();
+  // resetEffects();
   pristine.reset();
   overlay.classList.add('hidden');
   body.classList.remove('modal-open');
@@ -74,7 +78,6 @@ pristine.addValidator(
 const onFormSubmit = (evt) => {
   evt.preventDefault();
   pristine.validate();
-  console.log('dcfvgbh');
   closeModal();
 
 };
