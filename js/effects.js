@@ -59,11 +59,11 @@ const effectLevelElement = document.querySelector('.effect-level__value');
 
 const isDefault = () => currentEffect === DEFAULT_EFFECT;
 
-const openSlider = () => {
+const showSlider = () => {
   sliderContainerElement.classList.remove('hidden');
 };
 
-const closeSlider = () => {
+const hideSlider = () => {
   sliderContainerElement.classList.add('hidden');
 };
 
@@ -78,9 +78,9 @@ const updateSlider = () => {
   });
 
   if (isDefault()) {
-    closeSlider();
+    hideSlider();
   } else {
-    openSlider();
+    showSlider();
   }
 };
 
@@ -115,7 +115,7 @@ window.noUiSlider.create(sliderElement, {
   step:DEFAULT_EFFECT.step,
   connect: 'lower',
 });
-closeSlider();
+hideSlider();
 
 effectsElement.addEventListener('change', onEffectsChange);
 sliderElement.noUiSlider.on('update', onSliderUpdate);
