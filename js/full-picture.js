@@ -1,25 +1,23 @@
 import {isEscapeKey} from './util.js';
-import {getData} from './api.js';
-import {showAlert} from './util.js';
+
+const COMMENTS_PER_LOAD = 5;
 
 const body = document.querySelector('body');
 // большая версия каринки
 const bigPictureElement = document.querySelector('.big-picture');
 const bigPictureImgElement = bigPictureElement.querySelector('.big-picture__img img');
-// маленькая версия картинки
-const bigPictureOpenElements = document.querySelectorAll('.picture');
 // крестик на большой картинке
 const bigPictureCloseElement = bigPictureElement.querySelector('.big-picture__cancel');
 const countLikesElement = bigPictureElement.querySelector('.likes-count');
 const countCommentsElement = bigPictureElement.querySelector('.comments-count');
-const commentsList = bigPictureElement.querySelector('.social__comments');
 const descriptionElement = bigPictureElement.querySelector('.social__caption');
-const currentCommetsCount = bigPictureElement.querySelector('.comments-current-count');
-const commentsLoader = document.querySelector('.comments-loader');
-const PAGE_LIMIT = 5;
-const FIRST_PAGE_INDEX = 1;
+const commentLoader = bigPictureElement.querySelector('.comments-loader');
+const commentTemplate = document.querySelector('#social__comment').content.querySelector('.social__comment');
+const bigPicCommentsSection = bigPictureElement.querySelector('.social__comments');
 
-let currentPage = FIRST_PAGE_INDEX;
+const minCommentsCount = bigPictureElement.querySelector('.comments-current-count');
+let batchOfComments;
+let localComments;
 
 
 const onBigPictureEscKeydown = (evt) => {
@@ -29,10 +27,20 @@ const onBigPictureEscKeydown = (evt) => {
   }
 };
 
-//Пришлось занести в функцию openBigPicture функции handleButtonStatus и showComments,
-//так как найти способ как-то по-другому удалять обработчик кнопки commentsLoader не получилось
+const closeBigPicture = () => {
+  document.querySelector('.big-picture').classList.add('hidden');
 
-//Функция для открытия модалки с большим фото и подробной информацией
+  document.removeEventListener('keydown', onBigPictureEscKeydown);
+
+  body.classList.remove('modal-open');
+  document.removeEventListener('keydown', onBigPictureEscKeydown);
+  commentLoader.removeEventListener('click', loadMoreComments);
+};
+
+bigPictureCloseElement.addEventListener('click', () => {
+  closeBigPicture();
+});
+
 const openBigPicture = (src, countLikes, countComments, description) => {
   //Добавляем данные выбранного фото в разметку
   bigPictureImgElement.src = src;
@@ -41,123 +49,71 @@ const openBigPicture = (src, countLikes, countComments, description) => {
   descriptionElement.textContent = description;
 
   bigPictureElement.classList.remove('hidden');
-  console.log(bigPictureElement);
 
   document.addEventListener('keydown', onBigPictureEscKeydown);
 
   body.classList.add('modal-open');
+};
+  // Отрисовка отдельно взятого коммента и добавление в <ul>
+const createComments = (comments) => {
+  const singleCommentFragment = document.createDocumentFragment();
+  comments.forEach(({avatar, message, name}) => {
+    const newComment = commentTemplate.cloneNode(true);
+    newComment.querySelector('.social__picture').src = avatar;
+    newComment.querySelector('.social__picture').alt = name;
+    newComment.querySelector('.social__text').textContent = message;
+    singleCommentFragment.appendChild(newComment);
+  });
+  bigPicCommentsSection.innerHTML = '';
+  bigPicCommentsSection.appendChild(singleCommentFragment);
+};
 
-  //Массив данных с элементами - комментариями
-  const commentsArray = bigPictureElement.querySelectorAll('.social__comment');
-
-  //Считаем количество всех страниц с комментариями
-  const pageCount = Math.ceil(commentsArray.length / PAGE_LIMIT);
-
-  //сбрасываем счетчик текущей страницы на начальное значение
-
-  currentPage = FIRST_PAGE_INDEX;
-  currentCommetsCount.textContent = commentsArray.length > PAGE_LIMIT ? PAGE_LIMIT : commentsArray.length;
-  commentsLoader.classList.remove('hidden');
-
-  //Скрываем все комментарии, которые потом будем показывать постранично по нажатию на кнопку "Показать еще"
-  for (let i = currentCommetsCount.textContent; i < commentsArray.length; i++) {
-    commentsArray[i].classList.add('hidden');
+// Отображение комментариев
+const loadComments = () => {
+  if (localComments.length <= COMMENTS_PER_LOAD) {
+    createComments(localComments);
+    commentLoader.classList.add('hidden');
+  } else {
+    commentLoader.classList.remove('hidden');
+    batchOfComments = COMMENTS_PER_LOAD;
+    createComments(localComments.slice(0, batchOfComments));
   }
+  commentLoader.addEventListener('click', loadMoreComments);
+};
 
-  const handleButtonStatus = () => {
-    if (pageCount <= currentPage) {
-      commentsLoader.classList.add('hidden');
-      commentsLoader.removeEventListener('click', myListener);
-    }
-  };
-
-  handleButtonStatus();
-
-  //Функция постраничного отображения комментариев
-  const showComments = (pageIndex) => {
-    //увеличиваем индекс текущей страницы
-    currentPage = pageIndex;
-
-    //Проверяем, находимся ли мы на последней странице, чтобы скрыть кнопку "Показать еще"
-    handleButtonStatus();
-
-    const startRange = (pageIndex - 1) * PAGE_LIMIT;
-    const endRange = currentPage === pageCount ? commentsArray.length : pageIndex * PAGE_LIMIT;
-
-    for (let i = startRange; i < endRange; i++) {
-      commentsArray[i].classList.remove('hidden');
-    }
-
-    //Обновляем цифру отображенных комментов на странице в разметке
-    currentCommetsCount.textContent = endRange;
-  };
-
-  function myListener() {
-    showComments(currentPage + 1);
+// Загрузка новых комментариев
+function loadMoreComments () {
+  batchOfComments += COMMENTS_PER_LOAD;
+  const loadedComments = localComments.slice(0, batchOfComments);
+  if (loadedComments.length === localComments.length) {
+    commentLoader.classList.add('hidden');
   }
-
-  //Обработчик нажатия на кнопку "Показать еще"
-  commentsLoader.addEventListener('click', myListener);
-};
-
-const generateComments = (commentsArray) => {
-  const commentElement = bigPictureElement.querySelector('.social__comment').cloneNode(true);
-
-  //Очищаем список комментариев
-  commentsList.innerHTML = '';
-
-  //Создаем комментарии с данными выбранного фото и добавляем их в модалку
-  commentsArray.forEach((comment) => {
-    const cloneCommentElement = commentElement.cloneNode(true);
-    cloneCommentElement.querySelector('.social__picture').src = comment.avatar;
-    cloneCommentElement.querySelector('.social__picture').alt = comment.name;
-    cloneCommentElement.querySelector('.social__text').textContent = comment.message;
-    commentsList.appendChild(cloneCommentElement);
-  });
-};
-
-const addEventListenersPictures = (data) => {
-  bigPictureOpenElements.forEach((picture, index) => {
-    picture.addEventListener('click', (evt) => {
-      evt.preventDefault();
-      console.log('fghj');
-      const commentsArray = data[index].comments;
-      generateComments(commentsArray);
-
-      const imgSrc = picture.querySelector('img').src;
-      const imgLikes = picture.querySelector('.picture__likes').textContent;
-      const imgComents = picture.querySelector('.picture__comments').textContent;
-      const imgDescription = data[index].description;
-
-      openBigPicture(imgSrc, imgLikes, imgComents, imgDescription);
-    });
-  });
-};
-
-try {
-  const picturesData = await getData();
-
-  console.log('picturesData', picturesData);
-
-  window.addEventListener('DOMContentLoaded', () => {
-    addEventListenersPictures(picturesData);
-  });
-
-
-}catch (err) {
-  showAlert(err.message);
+  createComments(loadedComments);
+  minCommentsCount.textContent = loadedComments.length;
 }
 
-const closeBigPicture = () => {
-  document.querySelector('.big-picture').classList.add('hidden');
+const addEventListenersPictures = (data) => {
+  const onMiniPicClick = (evt) => {
+    if(evt.target.closest('.picture')) {
+      const target = evt.target.closest('.picture');
+      const localPicElement = data.find((photoItem) => Number(target.dataset.id) === photoItem.id);
+      localComments = localPicElement.comments;
+      loadComments(localComments);
+      const numberOfComments = localPicElement.comments.length;
 
-  document.removeEventListener('keydown', onBigPictureEscKeydown);
+      const imgSrc = localPicElement.url;
+      const imgLikes = localPicElement.likes;
+      const imgComents = localPicElement.comments.length;
+      const imgDescription = localPicElement.description;
 
-  body.classList.remove('modal-open');
+      minCommentsCount.textContent = numberOfComments <= COMMENTS_PER_LOAD ? numberOfComments : COMMENTS_PER_LOAD;
+
+      openBigPicture(imgSrc, imgLikes, imgComents, imgDescription);
+    }
+  };
+
+  document.querySelector ('.pictures').addEventListener('click', onMiniPicClick);
 };
 
-bigPictureCloseElement.addEventListener('click', () => {
-  closeBigPicture();
-});
 
-export {openBigPicture, closeBigPicture};
+export {openBigPicture, closeBigPicture, addEventListenersPictures};

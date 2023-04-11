@@ -4,7 +4,7 @@ import { isEscapeKey } from './util.js';
 
 const createElementMessage = (selector) => {
   const template = document.querySelector(selector).content;
-  const sectionElement = template.querySelector(selector).content;
+  const sectionElement = template.querySelector('section');
   const cloneElement = sectionElement.cloneNode(true);
   document.body.appendChild(cloneElement);
 };

@@ -15,7 +15,7 @@ const generatePictures = (data) => {
     picturesElement.querySelector('.picture__likes').textContent = picture.likes;
     picturesElement.querySelector('.picture__comments').textContent = picture.comments.length;
 
-
+    picturesElement.dataset.id = picture.id;
     pictureListElement.appendChild(picturesElement);
   });
 
