@@ -1,5 +1,6 @@
 import {isEscapeKey} from './util.js';
-import {picturesData} from './picture.js';
+import {getData} from './api.js';
+import {showAlert} from './util.js';
 
 const body = document.querySelector('body');
 // большая версия каринки
@@ -40,6 +41,7 @@ const openBigPicture = (src, countLikes, countComments, description) => {
   descriptionElement.textContent = description;
 
   bigPictureElement.classList.remove('hidden');
+  console.log(bigPictureElement);
 
   document.addEventListener('keydown', onBigPictureEscKeydown);
 
@@ -114,20 +116,37 @@ const generateComments = (commentsArray) => {
   });
 };
 
-bigPictureOpenElements.forEach((picture, index) => {
-  picture.addEventListener('click', (evt) => {
-    evt.preventDefault();
-    const commentsArray = picturesData[index].comments;
-    generateComments(commentsArray);
+const addEventListenersPictures = (data) => {
+  bigPictureOpenElements.forEach((picture, index) => {
+    picture.addEventListener('click', (evt) => {
+      evt.preventDefault();
+      console.log('fghj');
+      const commentsArray = data[index].comments;
+      generateComments(commentsArray);
 
-    const imgSrc = picture.querySelector('img').src;
-    const imgLikes = picture.querySelector('.picture__likes').textContent;
-    const imgComents = picture.querySelector('.picture__comments').textContent;
-    const imgDescription = picturesData[index].description;
+      const imgSrc = picture.querySelector('img').src;
+      const imgLikes = picture.querySelector('.picture__likes').textContent;
+      const imgComents = picture.querySelector('.picture__comments').textContent;
+      const imgDescription = data[index].description;
 
-    openBigPicture(imgSrc, imgLikes, imgComents, imgDescription);
+      openBigPicture(imgSrc, imgLikes, imgComents, imgDescription);
+    });
   });
-});
+};
+
+try {
+  const picturesData = await getData();
+
+  console.log('picturesData', picturesData);
+
+  window.addEventListener('DOMContentLoaded', () => {
+    addEventListenersPictures(picturesData);
+  });
+
+
+}catch (err) {
+  showAlert(err.message);
+}
 
 const closeBigPicture = () => {
   document.querySelector('.big-picture').classList.add('hidden');
