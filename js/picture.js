@@ -38,44 +38,51 @@ const showFilters = () => {
 };
 
 const sortPhotos = (photos) => {
+  const sortingForm = document.querySelector('.img-filters__form');
   const defaultSorting = document.querySelector('#filter-default');
+  const SORTING_METHODS = {
+    defaultSorting: 'filter-default',
+    randomSorting: 'filter-random',
+    sortingByComments: 'filter-discussed',
+  };
   const randomSorting = document.querySelector('#filter-random');
   const sortingByComments = document.querySelector('#filter-discussed');
 
-  defaultSorting.addEventListener('click', debounce(() => {
-    defaultSorting.classList.add('img-filters__button--active');
-    randomSorting.classList.remove('img-filters__button--active');
-    sortingByComments.classList.remove('img-filters__button--active');
-    const picArray = document.querySelectorAll('.picture');
-    picArray.forEach((picture) => {
-      picture.remove();
-    });
-    generatePictures(photos);
-  }, RERENDER_DELAY));
+  sortingForm.addEventListener('click', debounce((evt) => {
+    const buttonId = evt.target.id;
+    if (buttonId === SORTING_METHODS.defaultSorting){
+      defaultSorting.classList.add('img-filters__button--active');
+      randomSorting.classList.remove('img-filters__button--active');
+      sortingByComments.classList.remove('img-filters__button--active');
+      const picArray = document.querySelectorAll('.picture');
+      picArray.forEach((picture) => {
+        picture.remove();
+      });
+      generatePictures(photos);
+    } else if (buttonId === SORTING_METHODS.randomSorting) {
+      defaultSorting.classList.remove('img-filters__button--active');
+      randomSorting.classList.add('img-filters__button--active');
+      sortingByComments.classList.remove('img-filters__button--active');
+      const sortedPhotos = photos.slice().sort(sortRandomly).slice(0, RANDOM_PHOTOS);
+      const picArray = document.querySelectorAll('.picture');
+      picArray.forEach((picture) => {
+        picture.remove();
+      });
+      generatePictures(sortedPhotos);
+    } else if (buttonId === SORTING_METHODS.sortingByComments) {
+      sortingByComments.classList.add('img-filters__button--active');
+      defaultSorting.classList.remove('img-filters__button--active');
+      randomSorting.classList.remove('img-filters__button--active');
+      const sortedPhotos = photos.slice().sort(sortByComments);
+      const picArray = document.querySelectorAll('.picture');
+      picArray.forEach((picture) => {
+        picture.remove();
+      });
+      generatePictures(sortedPhotos);
+    }
 
-  randomSorting.addEventListener('click', debounce(() => {
-    defaultSorting.classList.remove('img-filters__button--active');
-    randomSorting.classList.add('img-filters__button--active');
-    sortingByComments.classList.remove('img-filters__button--active');
-    const sortedPhotos = photos.slice().sort(sortRandomly).slice(0, RANDOM_PHOTOS);
-    const picArray = document.querySelectorAll('.picture');
-    picArray.forEach((picture) => {
-      picture.remove();
-    });
-    generatePictures(sortedPhotos);
-  }, RERENDER_DELAY));
-
-  sortingByComments.addEventListener('click', debounce(() => {
-    sortingByComments.classList.add('img-filters__button--active');
-    defaultSorting.classList.remove('img-filters__button--active');
-    randomSorting.classList.remove('img-filters__button--active');
-    const sortedPhotos = photos.slice().sort(sortByComments);
-    const picArray = document.querySelectorAll('.picture');
-    picArray.forEach((picture) => {
-      picture.remove();
-    });
-    generatePictures(sortedPhotos);
   }, RERENDER_DELAY));
 };
+
 
 export {generatePictures, showFilters, sortPhotos};
