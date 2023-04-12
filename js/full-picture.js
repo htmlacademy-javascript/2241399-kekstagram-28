@@ -3,10 +3,8 @@ import {isEscapeKey} from './util.js';
 const COMMENTS_PER_LOAD = 5;
 
 const body = document.querySelector('body');
-// большая версия каринки
 const bigPictureElement = document.querySelector('.big-picture');
 const bigPictureImgElement = bigPictureElement.querySelector('.big-picture__img img');
-// крестик на большой картинке
 const bigPictureCloseElement = bigPictureElement.querySelector('.big-picture__cancel');
 const countLikesElement = bigPictureElement.querySelector('.likes-count');
 const countCommentsElement = bigPictureElement.querySelector('.comments-count');
@@ -25,6 +23,44 @@ const onBigPictureEscKeydown = (evt) => {
     evt.preventDefault();
     bigPictureElement.classList.add('hidden');
   }
+};
+
+// Отрисовка отдельно взятого коммента и добавление в <ul>
+const createComments = (comments) => {
+  const singleCommentFragment = document.createDocumentFragment();
+  comments.forEach(({avatar, message, name}) => {
+    const newComment = commentTemplate.cloneNode(true);
+    newComment.querySelector('.social__picture').src = avatar;
+    newComment.querySelector('.social__picture').alt = name;
+    newComment.querySelector('.social__text').textContent = message;
+    singleCommentFragment.appendChild(newComment);
+  });
+  bigPicCommentsSection.innerHTML = '';
+  bigPicCommentsSection.appendChild(singleCommentFragment);
+};
+
+// Загрузка новых комментариев
+const loadMoreComments = () => {
+  batchOfComments += COMMENTS_PER_LOAD;
+  const loadedComments = localComments.slice(0, batchOfComments);
+  if (loadedComments.length === localComments.length) {
+    commentLoader.classList.add('hidden');
+  }
+  createComments(loadedComments);
+  minCommentsCount.textContent = loadedComments.length;
+};
+
+// Отображение комментариев
+const loadComments = () => {
+  if (localComments.length <= COMMENTS_PER_LOAD) {
+    createComments(localComments);
+    commentLoader.classList.add('hidden');
+  } else {
+    commentLoader.classList.remove('hidden');
+    batchOfComments = COMMENTS_PER_LOAD;
+    createComments(localComments.slice(0, batchOfComments));
+  }
+  commentLoader.addEventListener('click', loadMoreComments);
 };
 
 const closeBigPicture = () => {
@@ -54,43 +90,6 @@ const openBigPicture = (src, countLikes, countComments, description) => {
 
   body.classList.add('modal-open');
 };
-  // Отрисовка отдельно взятого коммента и добавление в <ul>
-const createComments = (comments) => {
-  const singleCommentFragment = document.createDocumentFragment();
-  comments.forEach(({avatar, message, name}) => {
-    const newComment = commentTemplate.cloneNode(true);
-    newComment.querySelector('.social__picture').src = avatar;
-    newComment.querySelector('.social__picture').alt = name;
-    newComment.querySelector('.social__text').textContent = message;
-    singleCommentFragment.appendChild(newComment);
-  });
-  bigPicCommentsSection.innerHTML = '';
-  bigPicCommentsSection.appendChild(singleCommentFragment);
-};
-
-// Отображение комментариев
-const loadComments = () => {
-  if (localComments.length <= COMMENTS_PER_LOAD) {
-    createComments(localComments);
-    commentLoader.classList.add('hidden');
-  } else {
-    commentLoader.classList.remove('hidden');
-    batchOfComments = COMMENTS_PER_LOAD;
-    createComments(localComments.slice(0, batchOfComments));
-  }
-  commentLoader.addEventListener('click', loadMoreComments);
-};
-
-// Загрузка новых комментариев
-function loadMoreComments () {
-  batchOfComments += COMMENTS_PER_LOAD;
-  const loadedComments = localComments.slice(0, batchOfComments);
-  if (loadedComments.length === localComments.length) {
-    commentLoader.classList.add('hidden');
-  }
-  createComments(loadedComments);
-  minCommentsCount.textContent = loadedComments.length;
-}
 
 const addEventListenersPictures = (data) => {
   const onMiniPicClick = (evt) => {
