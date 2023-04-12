@@ -5,7 +5,10 @@ import { resetEffects } from './effects.js';
 const VALID_SYMBOLS = /^#[a-zа-яё0-9]{1,19}$/i;
 const MAX_HASHTAG_COUNT = 5;
 const TAG_ERROR_TEXT = 'Хэштеги заполнены неверно';
+const FILE_TYPES = ['jpg', 'jpeg', 'png'];
 
+const fileChooser = document.querySelector('.img-upload__input');
+const preview = document.querySelector('.img-upload__preview img');
 const form = document.querySelector('.img-upload__form');
 const overlay = document.querySelector('.img-upload__overlay');
 const body = document.querySelector('body');
@@ -25,6 +28,7 @@ const openModal = () => {
   overlay.classList.remove('hidden');
   body.classList.add('modal-open');
   document.addEventListener('keyddown', onDocumentKeydown);
+  resetScale();
 };
 
 const closeModal = () => {
@@ -52,7 +56,16 @@ const onCancelButtonClick = () => {
   closeModal();
 };
 
+
 const onFileInputChange = () => {
+  const file = fileChooser.files[0];
+  const fileName = file.name.toLowerCase();
+
+  const matches = FILE_TYPES.some((it) => fileName.endsWith(it));
+
+  if (matches) {
+    preview.src = URL.createObjectURL(file);
+  }
   openModal();
 };
 
