@@ -25,7 +25,7 @@ const onSmallerButtonClick = () => {
 const onBiggerButtonClick = () => {
   const currentIndex = parseInt(scaleElement.value, 10);
   let newIndex = currentIndex + SCALE_STEP;
-  if(newIndex > MIN_SCALE) {
+  if(newIndex > MAX_SCALE) {
     newIndex = MAX_SCALE;
   }
   scaleImage(newIndex);
