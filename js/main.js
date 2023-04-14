@@ -28,5 +28,9 @@ setOnFormSubmit(async (data) => {
 getData()
   .then((photosFromServer) => {
     renderGallery(photosFromServer);
+    generatePictures(photosFromServer);
     addEventListenersPictures(photosFromServer);
+    showFilters();
+    sortPhotos(photosFromServer);
   });
+
