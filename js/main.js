@@ -11,6 +11,7 @@ import './message.js';
 import { getData, sendData } from './api.js';
 import {setOnFormSubmit, closeModal} from './form.js';
 import {renderGallery} from './gallery.js';
+import { sortPhotos, generatePictures, showFilters } from './picture.js';
 import {showSuccessMessage, showErrorMessage} from './message.js';
 import { addEventListenersPictures } from './full-picture.js';
 
