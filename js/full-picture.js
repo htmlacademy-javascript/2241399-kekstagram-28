@@ -92,7 +92,7 @@ const openBigPicture = (src, countLikes, countComments, description) => {
 };
 
 const addEventListenersPictures = (data) => {
-  const onMiniPicClick = (evt) => {
+  const onSmallPictureClick = (evt) => {
     if(evt.target.closest('.picture')) {
       const target = evt.target.closest('.picture');
       const localPicElement = data.find((photoItem) => Number(target.dataset.id) === photoItem.id);
@@ -111,7 +111,7 @@ const addEventListenersPictures = (data) => {
     }
   };
 
-  document.querySelector ('.pictures').addEventListener('click', onMiniPicClick);
+  document.querySelector ('.pictures').addEventListener('click', onSmallPictureClick);
 };
 
 
