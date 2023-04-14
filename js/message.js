@@ -1,7 +1,5 @@
 import { isEscapeKey } from './util.js';
 
-// const body = document.querySelector('body');
-
 const createElementMessage = (selector) => {
   const template = document.querySelector(selector).content;
   const sectionElement = template.querySelector('section');

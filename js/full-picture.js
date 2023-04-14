@@ -3,10 +3,8 @@ import {isEscapeKey} from './util.js';
 const COMMENTS_PER_LOAD = 5;
 
 const body = document.querySelector('body');
-// большая версия каринки
 const bigPictureElement = document.querySelector('.big-picture');
 const bigPictureImgElement = bigPictureElement.querySelector('.big-picture__img img');
-// крестик на большой картинке
 const bigPictureCloseElement = bigPictureElement.querySelector('.big-picture__cancel');
 const countLikesElement = bigPictureElement.querySelector('.likes-count');
 const countCommentsElement = bigPictureElement.querySelector('.comments-count');
@@ -93,7 +91,7 @@ function loadMoreComments () {
 }
 
 const addEventListenersPictures = (data) => {
-  const onMiniPicClick = (evt) => {
+  const onSmallPictureClick = (evt) => {
     if(evt.target.closest('.picture')) {
       const target = evt.target.closest('.picture');
       const localPicElement = data.find((photoItem) => Number(target.dataset.id) === photoItem.id);
@@ -112,7 +110,7 @@ const addEventListenersPictures = (data) => {
     }
   };
 
-  document.querySelector ('.pictures').addEventListener('click', onMiniPicClick);
+  document.querySelector ('.pictures').addEventListener('click', onSmallPictureClick);
 };
 
 

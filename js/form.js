@@ -27,7 +27,7 @@ const pristine = new Pristine (form, {
 const openModal = () => {
   overlay.classList.remove('hidden');
   body.classList.add('modal-open');
-  document.addEventListener('keyddown', onDocumentKeydown);
+  document.addEventListener('keydown', onDocumentKeydown);
   resetScale();
 };
 
@@ -46,7 +46,7 @@ const isTextFieldFocused = () =>
 document.activeElement === commentField;
 
 function onDocumentKeydown(evt) {
-  if (isEscapeKey() && !isTextFieldFocused()) {
+  if (isEscapeKey(evt) && !isTextFieldFocused()) {
     evt.preventDefault();
     closeModal();
   }
@@ -106,7 +106,7 @@ const setOnFormSubmit = (cb) => {
 
     if (isValid) {
       blockSubmitButton();
-      await cb(new FormData(form));
+      await cb(new FormData(evt.target));
       unblockSubmitButton();
     }
   });
@@ -114,6 +114,5 @@ const setOnFormSubmit = (cb) => {
 
 fileField.addEventListener('change', onFileInputChange);
 cancelButton.addEventListener('click', onCancelButtonClick);
-form.addEventListener('submit', setOnFormSubmit);
 
 export {closeModal, setOnFormSubmit};
